@@ -18,14 +18,17 @@ module.exports = function(grunt) {
 
     grunt.verbose.writeflags(options, 'Options');
 
+    if (options.processName) {
+      grunt.log.warn('processName is depreciated, use the "rename" function. \n' +
+        'See http://gruntjs.com/configuring-tasks#building-the-files-object-dynamically');
+      delete options.processName;
+    }
+
     var done = this.async();
     var jar = __dirname + '/../ext/htmlcompressor-1.5.3.jar';
-    var processName = options.processName;
     var concurrent = parseInt(options.concurrentProcess, 10) > 0 ? options.concurrentProcess : 50;
     var running = 0;
     var srcFiles = [];
-
-    delete options.processName;
 
     var compress = function (done) {
       if (srcFiles.length > 0) {
@@ -41,11 +44,8 @@ module.exports = function(grunt) {
             grunt.fail.warn('htmlcompressor failed to compress html.');
             done(err);
           } else {
-            var html = output.stdout;
-            var dest = _.isFunction(processName) ?
-              processName(file.src, html) : file.dest;
-            grunt.file.write(dest, html);
-            grunt.log.writeln('File "' + dest + '" created.');
+            grunt.file.write(file.dest, output.stdout);
+            grunt.log.writeln('File "' + file.dest + '" created.');
             running--;
             compress(done);
           }

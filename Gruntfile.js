@@ -11,16 +11,27 @@ module.exports = function(grunt) {
     },
     htmlcompressor: {
       compress: {
+        expand: true,
+        src: [
+          'test/fixtures/html/*.html'
+        ],
+        rename: function (dest, matchedSrcPath) {
+            return 'test/fixtures/output/' + matchedSrcPath.split('/').pop();
+        },
+        options: {
+          type: 'html',
+          preserveServerScript: true
+        }
+      },
+      depreciated: {
         src: [
           'test/fixtures/html/*.html'
         ],
         options: {
-          type: 'html',
           processName: function (path) {
             path = path.split('/').pop();
             return 'test/fixtures/output/' + path;
-          },
-          preserveServerScript: true
+          }
         }
       }
     },
